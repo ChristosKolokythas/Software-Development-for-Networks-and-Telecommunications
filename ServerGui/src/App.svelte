@@ -9,7 +9,7 @@ onMount(async () => {
 
   //Draw the map
   const googleMapsScript = document.createElement('script');
-  googleMapsScript.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyCXPOGVmiQi21YXGnUmIDegztJeUfykaCc&callback=Function.prototype`;
+  googleMapsScript.src = `https://maps.googleapis.com/maps/api/js?key=[API_KEY]&callback=Function.prototype`;
   document.head.appendChild(googleMapsScript);
   googleMapsScript.onload = () => {
     map = new google.maps.Map(document.getElementById('map'), {
