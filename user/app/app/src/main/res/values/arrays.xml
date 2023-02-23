@@ -1,0 +1,10 @@
+<resources>
+    <string-array name="file_names">
+        <item>File 1</item>
+        <item>File 2</item>
+    </string-array>
+    <string-array name="file_values">
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+</resources>

@@ -1,0 +1,45 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        app:title="IP Port and Location">
+        //app:icon="@drawable/ic_baseline_computer_24"
+
+        <EditTextPreference
+            app:defaultValue="ws://broker.emqx.io"
+            app:key="edit_ip"
+            app:singleLine="true"
+            app:title="Edit IP Address"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:defaultValue="8083"
+            app:key="edit_port"
+            app:singleLine="true"
+            app:title="Edit Port"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreference
+            app:key="manual"
+            app:summaryOn="Choose Manual Location"
+            app:summaryOff="Gps Location"
+            app:defaultValue="false"
+            app:title="Manual Location"
+            />
+        <ListPreference
+            android:dependency="manual"
+            android:entries="@array/file_names"
+            android:entryValues="@array/file_values"
+            android:key="list_preference_1"
+            android:defaultValue="4"
+            android:title="Choose between File 1 and 2"
+            />
+        <EditTextPreference
+            android:dependency="manual"
+            app:defaultValue="10"
+            app:key="time_space"
+            app:singleLine="true"
+            app:title="Time Space"
+            app:useSimpleSummaryProvider="true"
+            />
+
+    </PreferenceCategory>
+</PreferenceScreen>
