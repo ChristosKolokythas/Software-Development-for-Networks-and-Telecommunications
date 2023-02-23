@@ -1,0 +1,16 @@
+<resources>
+    <!-- Reply Preference -->
+    <string-array name="loc_entries">
+        <item>37.96809452684323, 23.76630586399502</item>
+        <item>37.96799937191987, 23.766603589104385</item>
+        <item>37.967779456380754, 23.767174897611685</item>
+        <item>37.96790421900921, 23.76626294807113</item>
+    </string-array>
+
+    <string-array name="loc_values">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+</resources>

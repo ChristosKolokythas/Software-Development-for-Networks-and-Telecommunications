@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="8dp"
+    app:cardMaxElevation="10dp"
+    app:cardPreventCornerOverlap="true"
+    app:cardUseCompatPadding="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="272dp">
+
+        <!--ImageVIew to display our Course Image-->
+
+        <!--Text View to display Course Name-->
+
+        <ImageView
+            android:id="@+id/sensor_image"
+            android:layout_width="188dp"
+            android:layout_height="163dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="97dp"
+            android:contentDescription="@string/app_name"
+            android:padding="5dp"
+            android:src="@drawable/gas_sensor" />
+
+        <TextView
+            android:id="@+id/sensor_type"
+            android:layout_width="162dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="-365dp"
+            android:layout_marginTop="10dp"
+            android:layout_toEndOf="@id/sensor_image"
+            android:text="Sensor"
+            android:textColor="@color/black"
+            android:textSize="34sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/sensor_value"
+            android:layout_width="373dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/sensor_type"
+            android:layout_marginStart="-368dp"
+            android:layout_marginTop="130dp"
+            android:layout_toEndOf="@id/sensor_image"
+            android:valueFrom="0"
+            android:valueTo="11" />
+
+        <Switch
+            android:id="@+id/sensor_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/sensor_value"
+            android:layout_marginStart="-317dp"
+            android:layout_marginTop="-111dp"
+            android:layout_toEndOf="@id/sensor_image"
+            android:showText="true"
+            android:switchPadding="10dp"
+            android:textOff="OFF"
+            android:textOn="ON" />
+
+    </RelativeLayout>
+</androidx.cardview.widget.CardView>

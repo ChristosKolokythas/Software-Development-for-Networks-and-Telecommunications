@@ -1,0 +1,45 @@
+<PreferenceScreen xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        app:title="IP PortLocation and device_id">
+        //app:icon="@drawable/ic_baseline_computer_24"
+
+        <EditTextPreference
+            app:defaultValue="ws://broker.emqx.io"
+            app:key="edit_ip"
+            app:singleLine="true"
+            app:title="Edit IP Address"
+            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:defaultValue="8083"
+            app:key="edit_port"
+            app:singleLine="true"
+            app:title="Edit Port"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreference
+            app:defaultValue="false"
+            app:key="manual"
+            app:summaryOff="Gps Location"
+            app:summaryOn="Choose Manual Location"
+            app:title="Manual Location" />
+        <ListPreference
+            android:dependency="manual"
+            android:entries="@array/loc_entries"
+            android:entryValues="@array/loc_values"
+            android:key="list_preference_1"
+            android:defaultValue="4"
+            android:title="Choose x and y coordinates"
+            />
+
+
+
+    </PreferenceCategory>
+    <EditTextPreference
+        android:defaultValue="1"
+        android:key="edit_text_preference_1"
+        android:singleLine="true"
+        android:title="Device Id"
+        tools:useSimpleSummaryProvider="true" />
+</PreferenceScreen>
