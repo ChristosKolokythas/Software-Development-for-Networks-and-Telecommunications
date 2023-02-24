@@ -115,7 +115,7 @@ public class MyCallback implements MqttCallback {
 
                 smoke_flag = smoke > 0.14;
 
-                gas_flag = gas > 1.0065; //0.0915
+                gas_flag = gas > 1.0065; 
 
                 temp_flag = temp > 50;
 
