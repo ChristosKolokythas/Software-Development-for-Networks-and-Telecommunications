@@ -1,105 +1,106 @@
+# Android ApplicationsAndroid Applications
+#### 1. User application
+
+This is the application installed on the mobile phone of the user who wants to be informed in case a risk is detected. By opening it, the user connects to the MQTT server and receives audiovisual notifications of any risks.
+
+**Home Screen**
+On opening the application the user is presented with the main screen of the application in which the following options are available:
+An Enable/Disable button which immediately stops sending measurements to the server.
+The 3 dots which contain 2 options:
+I. Go to Settings.
+II. Exit the application. To exit the application, a pop-up window appears which asks for the user's confirmation to permanently exit the application.
+
+**Settings menu**
+In the Settings menu we have the following options:
+Edit IP Address: in this field we enter the IP for communication with the Edge Server.
+Port: In this field we enter the Port to communicate with the Edge Server.
+Manual Location: this switch is used to switch how to get location between using GPS and the 4 default locations.In case manual location is selected there are 2 more Settings.
+Choose File:Selects between the 2 files given by the pronunciation.
+TimeSpace:Selects the time space for which the measurement vectors are sent.
+
+**Connection Check**:
+Every 10 seconds the application checks via ConnectivityManager if it is connected to the internet. In case it detects absence of connection it displays a corresponding notification.
+
+ **location**
+As mentioned before, the location can be acquired in two ways, one automatic and one manual.
+When the automatic mode is selected, the FusedLocationProviderClient service is used to obtain the actual location of the user's device.
+If manual location is selected the application reads the XML files using parse of the pronunciation and stores the vectors they contain in corresponding tables, from which it derives the data it sends to the MQTT Server.
+
+**Communication with the Server**
+The user application communicates with the MQTT Server in order to receive notifications and send data via two corresponding topics.
+To receive a distress notification from the server it subscribes to the "notifications" topic.  From this topic it receives a json file derives the level of the hazard as well as the distance from the point where the hazard occurred.
+To send data to the server the application subscribes to the topic "android3". In this topic it sends a json file containing the location vector and the deviceID. (The deviceID is set as 3 to know that it is the android device).
+#####  2. IoT Sensor Application2. IoT Sensor Application.
+This is the application that contains the simulations of the four sensors required by the pronunciation. This application has many similarities with the user application in the way the settings menu works and the way the location is obtained through GPS. For this reason, only the points where the applications differ from each other will be analyzed below.
+
+**Home Screen**
+When opening the application we find the smoke and gas sensors pre-installed. At the bottom right of the screen is a floating button which allows us to install the other heat and UV sensors.
+The sensor tabs are displayed as a list via RecyclerView. Each tab contains the sensor name an abstract icon an on/off switch as well as a slider.
+The on/off switch activates and deactivates the sensor respectively regardless of its presence in the list.
+The slider of each sensor is set to move within the limits of the values given by the pronunciation. This way the possibility of sending an invalid value is avoided.
+
+**Settings**
+In the settings of the iot application we find the following extra functionalities:
+In case of manual location selection the user is asked to choose between four default locations.
+Device ID. This option accepts an integer number in order to make it clear to the server which iot device it is.
+
+**Communication with the Server**
+The application publishes to a topic whose name consists of the string ¨iot¨ + device_id(where device_id = 1, 2, 3 etc). In this topic it sends a json file containing the coordinates, the battery level, the device ID and the data from the sensors (name, number and value).
+
+**Use of the applications**
+Both apps can be used very easily either via emulator or on a physical device by installing the apk file and accepting the necessary licenses. The minimum API recommended for the apps is API 24.
+
 #Edge Server
-Για Calculator:
-Κάνει υπολογισμό απόστασης:
 
--> AlertSignal: έχει 4 παραμέτρους και 2 περιπτώσεις
+For Calculator: 
+does distance calculation:
 
+-> **AlertSignal**: has 4 parameters and 2 cases
 
+Point 2 to not exist (Iot2=null) 
 
-Το σημείο 2 να μην υπάρχει (Iot2=null)
-distance: δίνει την απόσταση του Android με το σημείο iot1 και την επιστρέφει.
+**distance**: gives the distance of the Android to point iot1 and returns it.
 
+All 2 points exist (Iot1,Iot2) distance: gives the distance of the Android to the 2 points (using the average distance of the points) and returns it.
 
-Υπάρχουν και τα 2 σημεία (Iot1,Iot2)
-distance: δίνει την απόσταση του Android με τα 2 σημεία (με την βοήθεια της μέσης απόστασης των σημείων) και την επιστρέφει.
+-> **getCentalPoint**: calculates the average distance of the 2 points 1.lanCentral calculates a new lat using the 2 lats of Iot1 and Iot2, which will be the average of the 2 lats 2.lonCentral calculates a new lon using the 2 lons of Iot1 and Iot2, which will be the average of the 2 lons 3.given a new point (let's say p) with the new values in lat and lon, which is the average distance of Iot1 and Iot2
 
+-> **calculateDistance**: we used the one given in the task.
 
+-> **Point**: it's helpful to not give too many coordinates so it's easier for what it gets (ie it has x, y). We do this so that getCentalPoint doesn't have 4 parameters, we put Point Iot1 in which it has 2 parameters in it (lat, lon) the respective ones i.e. (x, y).
 
+**For MyCallback:**
+->**messageArived**:First it creates a MqttClient, converts the message to a json object, sends it to the REST API by making a PUT request and depending on the value of the id variable (we have set the device id of the android device to 3 and for iot1,iot2 to 1 and 2 respectively) you execute a different piece of code.In case the id is 3 (i.e. we received a message from the android device) you create the android point with the current coordinates of the android device. Also the variable and_flag(initialized as false so that in case the server receives a message from an iot device with risk high/medium πρωτα,while it has no values for the coordinates of the android device it will not try to calculate the distance between iot and android) becomes true.
+In case the id is 1 or 2 (i.e. we received a message from an iot device) if there are active sensors it stores their value in the corresponding variable and calculates the risk level.If risk is high/medium the iot_flag of the device that sent the message
+takes the value true otherwise it takes the value false. If the risk is high/medium and the and_flag is true then MqttClient after calculating the distance of the iot device from the android (if the iot_flag of the other iot device is false) or the distance of the center of the 2 iot devices from the android (if the iot_flag of the other iot device is true) publishes in the appropriate topic (which is subscriber the android device) a message containing the risk level and the distance.
 
--> getCentalPoint: υπολογίζει την μέση απόσταση των 2 σημείων
-1.lanCentral υπολογισμός μια νέας lat μέσω των 2 lat των Iot1 και Iot2, η οποία θα αποτελεί τον μέσο όρο των 2 lat
-2.lonCentral υπολογισμός μια νεας lon μέσω των 2 lon των Iot1 και Iot2, η οποία θα αποτελεί τον μέσο όρο των 2 lon
-3.δίνεται ένα νέο σημείο (εστω p) με τις νέες τιμές στο lat και lon, το οποίο αποτελεί την μέση απόσταση των Iot1 Kai Iot2
-
-
--> calculateDistance: χρησιμοποιήσαμε αυτή που έχει δοθεί στην εκφώνηση.
-
-
--> Point: είναι βοηθητικό για να μην δίνει πολλές συντεταγμένες ώστε να είναι πιο εύκολο για το τι παίρνει (δηλαδή έχει x, y). Αυτό το κάνουμε για να μην έχει ο getCentalPoint 4 παραμέτρους, βάζουμε Point Iot1 στο οποίο έχει 2 παραμέτρους μέσα του (lat, lon) τα αντίστοιχα δηλαδή (χ, y).
-
-
-Για MyCallback:
-->messageArived:Αρχικα δημιουργεί ένα MqttClient,μετατρέπει το μήνυμα σε json object, το στέλνει στο REST API κάνοντας ένα PUT request και ανάλογα την τιμή της μεταβλητής id(έχουμε ορίσει σαν device id της android συσκευής το 3 και για τις iot1,iot2 το 1 και 2 αντίστοιχα) εκτελείτε διαφορετικό κομμάτι κώδικα.Στην περίπτωση που το id ειναι 3(δηλαδη λαβαμε μήνυμα από την android συσκευη)δημιουργείτε το android point με τις τρέχουσες συντεταγμένες της android συσκευής.Επίσης η μεταβλητή and_flag(αρχικοποιείται ως false ετσι ώστε στην περίπτωση που λάβει μήνυμα ο server απο καποια iot συσκευή με βαθμό κινδύνου (risk) high/medium πρωτα,ενω δεν εχει τιμες για της συντεταγμενες της android συσκευης να μην προσπαθήσει να υπολογίσει την απόσταση μεταξύ iot και android) γινεται true.
-Στην περίπτωση που το id ειναι 1 η 2(δηλαδη λαβαμε μηνυμα απο μια iot συσκευη)αν υπάρχουν ενεργοί ασθητήρες αποθηκεύει την τιμή τους στην αντίστοιχη μεταβλητή και υπολογίζει τον βαθμό κινδύνου (risk).Αν η risk ειναι high/medium το iot_flag της συσκευής που έστειλε το μήνυμα
-παίρνει την τιμή true αλλιώς παίρνει την τιμή false.Αν η risk ειναι high/medium και το and_flag ειναι true τότε ο MqttClient αφου πρώτα υπολογιστεί η απόσταση της iot συσκευής απο την android(αν το iot_flag της άλλης iot συσκευής είναι false)ή η αποσταση του κέντρου των 2 iot συσκευών απο την android(αν το iot_flag της άλλης iot συσκευής είναι true)  κάνει publish στο κατάλληλο topic(που είναι subscriber η android συσκευή)μήνυμα που περιέχει τον βαθμό επικινδυνότητας και την απόσταση.
-Για Main :Ορίζουμε τα topics και τον online broker που χρησιμοποιούμε για την επικοινωνία μεταξύ server,iot συσκευών και android.Δημιουργούμε ένα MqttClient ο οποίος κάνει subscribe στα παραπάνω topics και setCallback την MyCallback.
-Για να τρέξει ο server σωστά πρέπει να τρέχει το REST api.
-#REST api
-Για την σύνδεση της γραφικής διεπαφής με τον server δημιουργήθηκε ένα REST api σε node.js. To REST api λαμβάνει ένα json από τον server, μόλις έρθει μήνυμα από κάποια συσκευή, το γράφει στο αρχείο data.json και από εκεί το παίρνει η γραφική διεπαφή για να το επεξεργαστεί.
-Για να τρέξουμε το REST api χρειάζονται το node.js (v18.13.0) και το αντίστοιχο npm packet manager. Στον φάκελο του REST api εκτελούμε την εντολή “npm install” για να εγκατασταθούν τα απαιτούμενα πακέτα. Έπειτα για να το τρέξουμε εκτελούμε στον φάκελο την εντολή “node app.js”. To REST api είναι ρυθμισμένο να τρέχει στο port:3000.
+**For Main** :
+We define the topics and the online broker we use for communication between server,iot devices and android.We create a MqttClient which subscribes to the above topics and setCallback to MyCallback.
+For the server to run properly we need to run the REST api.
+**REST api**
+To connect the GUI to the server we created a REST api in node.js. The REST api receives a json from the server, once a message comes from a device, it writes it to the data.json file and from there the GUI gets it to process it.
+To run the REST api we need node.js (v18.13.0) and the corresponding npm packet manager. In the REST api folder we run the command "npm install" to install the required packages. Then to run it we run the command "node app.js" in the folder. The REST api is configured to run on port:3000.
 #ServerGui
-Η γραφική διεπαφή αναπτύχθηκε με javascript και συγκεκριμένα με το Svelte framework. H γραφική διεπαφή χρησιμοποιεί το Google Maps Api για να αποτυπώσει τον χάρτη.
-Η συνάρτηση fetchData χρησιμοποιείται για να “πάρει” τα δεδομένα η γραφική διεπαφή απο το REST api. Έπειτα η συνάρτηση καλή ανάλογα με το id της συσκευής (έχουμε ορίσει σαν device id της android συσκευής το 3 και για τις iot1, iot2 το 1 και 2 αντίστοιχα) καλεί την αντίστοιχη συνάρτηση ( addAndroidMarker για id 3 και addIotMarkers για 2 η 3.)
-Πάνω στον χάρτη εμφανίζονται τα markers της κάθε συσκευής. Υπάρχει διαφορετικό marker για την android συσκευή και για τις iot συσκευές. Το εικονίδιο της κάθε iot συσκευής αλλάζει ανάλογα με το επίπεδο κινδύνου της (risk level). Κάθε συσκευή έχει το δικό της infowindow το οποίο μπορούμε να το δούμε πατώντας πάνω στο marker της. Tα infowindows ανανεώνονται κάθε δευτερόλεπτο. Κάτω από τα markers της κάθε iot συσκευής υπάρχει ένας κύκλος που μας δείχνει αν η συσκευή είναι ενεργή.
-Όταν υπάρχει event κινδύνου (high ή medium) εμφανίζεται στον χάρτη ένα κόκκινο ορθογώνιο παραλληλόγραμμο, με τις 2 iot συσκευές τοποθετημένες στις γωνίες του, το οποίο δείχνει την επικίνδυνη περιοχή.
-Συναρτήσεις:
-->fetchData:Καλείται κάθε ένα δευτερόλεπτο με την χρήση της setinterval().Κάνει request στο api για να λάβει το json αρχείο με τα δεδομένα που έστειλε η κάθε συσκευή. Έπειτα κάνει parse το json που λαμβάνει από το api. Ανάλογα με το id καλεί την addAndroidMarker ή την addIotMarkers.
-->addAndroidMarker: Παίrνει ως ορίσματα την τοποθεσία (lat και lon) και to id της android συσκευής.Δημιουργεί ένα marker για την android συσκευή και το infowindow του αν δεν υπάρχει ήδη. Αν υπάρχει ανανεώνει την τοποθεσία του marker και τα περιεχόμενα του infowinfow.
-->addIotMarkers: Παίρνει ως ορίσματα την τοποθεσία (lat και lon) της iot συσκευής το id, την τιμή της μπαταρίας και τις τιμές των αισθητήρων της(gas,smoke,temp,uv). Αν δεν υπάρχει iot marker με το ίδιο id δημιουργεί το marker, το infowindow του, τον κύκλο κάτω από το marker (αν χρειάζεται) και δημιουργεί το ορθογώνιο παραλληλόγραμμο (αν χρειάζεται). Αν υπάρχει iot marker με το ίδιο id, ανανεώνει το infowindow, αλλάζει χρώμα, ή εξαφανίζει τον κύκλο, ανάλογα με την περίπτωση, αλλάζει το εικονίδιο του marker, αν χρειάζεται και εμφανίζει ή εξαφανίζει το ορθογώνιο παραλληλόγραμμο.
-->calculateRisκ: Παίρνει ως ορίσματα τις τιμές των αισθητήρων και επιστρέφει την τιμή του κινδύνου (1 για low risk, 2 για medium risk και 3 για high risk) ανάλογα με αυτές.
-->chooseIcon: Παίρνει ως όρισμα την τιμή του κινδύνου (risk) και διαλέγει το εικονίδιο για τα markers των iot συσκεύων.
-->getCircleColor: Παίρνει ως ορίσματα τις τιμές των αισθητήρων και διαλέγει το χρώμα του κύκλου με βάση το αν είναι όλες “null”.
-->drawPolygon: Δημιουργεί ένα ορθογώνιο παραλληλόγραμμο με βάση δύο σημεία στο χάρτη.
-Γι να τρέξει η γραφική διεπαφή χρειάζονται το node.js (v18.13.0) και το αντίστοιχο npm packet manager. Στον φάκελο της γραφικής διεπαφής εκτελούμε την εντολή “npm install” για να εγκατασταθούν τα απαιτούμενα πακέτα. Έπειτα για να τρέξουμε την γραφική διεπαφή στον φάκελο της εκτελούμε την εντολή “npm run dev”. Η γραφική διεπαφή είναι ρυθμισμένη να τρέχει στο port:8080 και μπορούμε να την δούμε στον browser στο:
+The graphical interface was developed with javascript and specifically with the Svelte framework. The graphical interface uses the Google Maps Api to render the map.
+
+The fetchData function is used to "fetch" the data the GUI from the REST api. Then the function good depending on the device id (we have set the device id of the android device to 3 and for iot1, iot2 to 1 and 2 respectively) calls the corresponding function ( addAndroidMarker for id 3 and addIotMarkers for 2 or 3.)
+
+The markers of each device are displayed on the map. There is a different marker for android device and for iot devices. The icon of each iot device changes according to its risk level. Each device has its own infowindow which we can see by clicking on its marker. The infowindows are updated every second. Below the markers of each iot device there is a circle that shows us if the device is active.
+
+When there is a danger event (high or medium) a red rectangle appears on the map, with the 2 iot devices placed at the corners, showing the danger area.
+Functions:
+->**fetchData:Called** every one second using setinterval().Makes a request to the api to get the json file with the data sent by each device. Then it parses the json it receives from the api. Depending on the id it calls addAndroidMarker or addIotMarkers.
+->**addAndroidMarker: **takes as arguments the location (lat and lon) and to id of the android device. it creates a marker for the android device and its infowindow if it doesn't already exist. If it exists it updates the location of the marker and the contents of the infowindow.
+->**addIotMarkers**: takes as arguments the location (lat and lon) of the iot device the id, the battery value and the values of its sensors(gas,smoke,temp,uv). If there is no iot marker with the same id it creates the marker, its infowindow, the circle under the marker (if needed) and creates the rectangular rectangle (if needed). If there is an iot marker with the same id, it refreshes the infowindow, changes the color, or disappears the circle as appropriate, changes the marker icon if needed, and displays or disappears the rectangular rectangle.
+->**calculateRisk**: takes the sensor values as arguments and returns the risk value (1 for low risk, 2 for medium risk and 3 for high risk) as appropriate.
+->**chooseIcon**: takes as argument the risk value (risk) and chooses the icon for the markers of the iot devices.
+->**getCircleColor**: takes as arguments the values of the sensors and chooses the color of the circle based on whether they are all "null".
+->**drawPolygon**: creates a rectangular polygon based on two points on the map.
+
+To run the GUI, node.js (v18.13.0) and the corresponding npm package manager are needed. In the graphical interface folder we run the command "npm install" to install the required packages. Then to run the GUI in its folder we execute the command "npm run dev". The GUI is configured to run on port:8080 and we can see it in the browser at:
 http://localhost:8080/
-Android Εφαρμογές
-1. Εφαρμογή χρήστη
-Πρόκειται για την εφαρμογή που θα έχει εγκατεστημένη στο κινητό του ο εκάστοτε χρήστης που θέλει να ενημερωθεί για τη περίπτωση ανίχνευσης κάποιου κινδύνου. Με το άνοιγμα της ο χρήστης συνδέεται με τον MQTT server και λαμβάνει οπτικοακουστικής μορφής ειδοποιήσεις για τυχόν κινδύνους.
-Αρχική Οθόνη
-Με το άνοιγμα της εφαρμογής ο χρήστης αντικρίζει την κύρια οθόνη της εφαρμογής στην οποία συναντά τις εξής επιλογές:
-Ένα κουμπί Enable/Disable το οποίο σταματάει άμεσα την αποστολή μετρήσεων προς τον server.
-Τις 3 τελείες οι οποίες περιέχουν 2 επιλογές:
-I. Μετάβαση στα Settings.
-II. ‘Εξοδο απο την εφαρμογή. Για την έξοδο από την εφαρμογή εμφανίζεται ένα αναδυόμενο παράθυρο το οποιο ζητάει την επιβεβαιωση του χρηστη για οριστικη διακοπη της εφαρμογης.
-Settings menu
-Στο Settings menu έχουμε τις εξής επιλογές:
-Edit IP Address: Στο πεδίο αυτό εισάγουμε την IP για την επικοινωνία με τον Edge Server.
-Port: Στο πεδίο αυτό εισάγουμε το Port για την επικοινωνία με τον Edge Server.
-Manual Location: Το switch αυτό χρησιμοποιείται για την εναλλαγή τρόπου λήψης τοποθεσίας μεταξύ της χρήσης GPS και των 4 προεπιλεγμένων τοποθεσιών.Σε περίπτωση που επιλεχθεί η χειροκίνητη τοποθεσία υπάρχουν 2 ακόμα Settings.
-Choose File:Επιλέγει μεταξύ των 2 αρχείων που δίνονται απο την εκφώνηση.
-TimeSpace: Επιλέγει το χρονικό διάστημα για το οποίο γίνεται αποστολή των διανυσμάτων των μετρήσεων.
-Έλεγχος σύνδεσης
-Κάθε 10 δευτερόλεπτα η εφαρμογή ελέγχει μέσω του ConnectivityManager εάν είναι συνδεδεμένη στο internet. Σε περίπτωση που εντοπίσει απουσία σύνδεσης εμφανίζει αντίστοιχη ειδοποίηση.
-Λήψη τοποθεσίας
-Όπως αναφέρθηκε προηγουμένως η λήψη της τοποθεσίας γίνεται με δύο τρόπους εναν αυτοματο και εναν χειροκινητο.
-Όταν έχει επιλεχθεί ο αυτόματος τρόπος χρησιμοποιείται η υπηρεσία FusedLocationProviderClient για τη λήψη της πραγματικής τοποθεσίας της συσκευής του χρήστη.
-Σε περίπτωση επιλογης χειροκίνητης τοποθεσίας η εφαρμογή διαβάζει τα XML αρχεία χρησιμοποιώντας parse της εκφώνησης και αποθηκεύει τα διανύσματα που περιέχουν σε αντίστοιχους πίνακες,απο τους οποίους αντλεί τα δεδομένα που στέλνει στον MQTT Server.
-Επικοινωνία με το Server
-Η εφαρμογή χρήστη επικοινωνεί με τον MQTT Server προκειμένου να λαμβάνει ειδοποιήσεις και να στέλνει δεδομένα μέσω δύο αντίστοιχων topics.
-Για να λάβει ειδοποίηση κινδύνου από τον server κάνει subscribe στο topic “notifications”.  Από το topic αυτό λαμβάνει ένα json αρχείο αντλεί το επίπεδο του κινδύνου καθώς και την απόσταση από το σημείο που εκδηλώθηκε ο κίνδυνος.
-Για να στείλει δεδομένα στον server η εφαρμογή κάνει subscribe στο topic “android3”. Στο topic αυτό στέλνει ένα json αρχείο που περιέχει το το διάνυσμα της τοποθεσίας και το deviceID. (Το deviceID είναι ορισμένο ως 3 για να γνωρίζουμε ότι πρόκειται για την android συσκευή).
-2. Εφαρμογή IoT Αισθητήρων
-Πρόκειται για την εφαρμογή που περιέχει τις προσομοιώσεις των τεσσάρων αισθητήρων που ζητούνται από την εκφώνηση. Η εφαρμογή αυτή παρουσιάζει πολλές ομοιότητες με την εφαρμογή user στον τρόπο λειτουργίας του μενού των settings καθώς και τον τρόπο με τον οποίο γίνεται η λήψη της τοποθεσίας μέσω GPS. Γι’ αυτό το λόγο παρακάτω θα αναλυθούν μόνο τα σημεία που διαφέρουν οι εφαρμογές μεταξύ τους.
-Αρχική Οθόνη
-Κατά το άνοιγμα της εφαρμογής συναντάμε προεγκατεστημένους τους αισθητήρες καπνού και αερίου. Στο κάτω δεξιό μέρος της οθόνης βρίσκεται ένα floating button το οποίο μας επιτρέπει να εγκαταστήσουμε τους υπόλοιπους αισθητήρες θερμότητας και UV ακτινοβολίας.
-Οι καρτέλες των αισθητήρων προβάλλονται σαν λίστα μέσω του RecyclerView. Κάθε καρτέλα περιέχει το όνομα του αισθητήρα ένα αφαιρετικό εικονίδιο ένα on/off switch καθώς και ένα slider.
-To on/off switch ενεργοποιεί και απενεργοποιεί τον αισθητήρα αντίστοιχα ανεξαρτήτως από την παρουσία του στη λίστα.
-Το slider κάθε αισθητήρα είναι ορισμένο να κινείται στα όρια των τιμών που μας δίνονται από την εκφώνηση. Με αυτόν τον τρόπο αποφεύγεται η πιθανότητα αποστολής μη έγκυρης τιμής.
-Settings
-Στις ρυθμίσεις της εφαρμογής iot συναντάμε τις εξής έξτρα λειτουργικότητες:
-Σε περίπτωση χειροκίνητης επιλογής τοποθεσίας ο χρήστης καλείται να διαλέξει μεταξύ τεσσάρων προεπιλεγμένων τοποθεσιών.
-Device ID. Αυτή η επιλογή δέχεται εναν ακέραιο αριθμό προκειμένου να είναι ξεκάθαρο στον server για ποια iot συσκευή πρόκειται.
-Επικοινωνία με το Server
-Η εφαρμογή κάνει publish σε ένα topic του οποίου το όνομα αποτελείται από το string ¨iot¨ + device_id(όπου device_id = 1, 2, 3 etc). Στο topic αυτό στέλνει ενα json αρχείο το οποίο περιέχει τις συντεταγμένες, τη στάθμη της μπαταρίας, το device ID καθώς και τα δεδομένα από τους αισθητήρες(όνομα, αριθμο και τιμή).
-Χρήση των εφαρμογών
-Και οι δύο εφαρμογές μπορούν να χρησιμοποιηθούν πολύ εύκολα είτε μέσω emulator είτε σε φυσική συσκευή με εγκατάσταση του apk αρχείου και αποδοχή των απαραίτητων αδειών. Το ελάχιστο API που προτείνεται για τις εφαρμογές ειναι API 24.
-Για πιο ολοκληρωμένη παρουσίαση με την χρήση screenshots υπάρχει και το αρχείο readme.pdf
 
-#ΟΝΟΜΑΤΑ ΟΜΑΔΑΣ
 
-Περάκης Πολυχρόνης   
-Καπατσούλιας Θεόδωρος  
-Κολοκύθας Χρήστος  
-Ψαρούδης Γιώργος 
-Ντέμου Σταυρούλα-Ευσταθία 
+For a more complete presentation using screenshots there is also the readme.pdf file
+
 
