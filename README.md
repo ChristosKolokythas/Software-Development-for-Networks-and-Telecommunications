@@ -50,7 +50,7 @@ The application publishes to a topic whose name consists of the string ¨iot¨ +
 **Use of the applications**
 Both apps can be used very easily either via emulator or on a physical device by installing the apk file and accepting the necessary licenses. The minimum API recommended for the apps is API 24.
 
-#Edge Server
+##Edge Server
 
 For Calculator: 
 does distance calculation:
@@ -81,7 +81,7 @@ For the server to run properly we need to run the REST api.
 To connect the GUI to the server we created a REST api in node.js. The REST api receives a json from the server, once a message comes from a device, it writes it to the data.json file and from there the GUI gets it to process it.
 To run the REST api we need node.js (v18.13.0) and the corresponding npm packet manager. In the REST api folder we run the command "npm install" to install the required packages. Then to run it we run the command "node app.js" in the folder. The REST api is configured to run on port:3000.
 
-#ServerGui
+###ServerGui
 
 The graphical interface was developed with javascript and specifically with the Svelte framework. The graphical interface uses the Google Maps Api to render the map.
 
