@@ -1,4 +1,4 @@
-# Android ApplicationsAndroid Applications
+# Android Applications
 #### 1. User application
 
 This is the application installed on the mobile phone of the user who wants to be informed in case a risk is detected. By opening it, the user connects to the MQTT server and receives audiovisual notifications of any risks.
