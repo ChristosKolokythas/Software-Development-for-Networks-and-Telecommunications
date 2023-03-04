@@ -92,11 +92,16 @@ The markers of each device are displayed on the map. There is a different marker
 When there is a danger event (high or medium) a red rectangle appears on the map, with the 2 iot devices placed at the corners, showing the danger area.
 Functions:
 ->**fetchData:Called** every one second using setinterval().Makes a request to the api to get the json file with the data sent by each device. Then it parses the json it receives from the api. Depending on the id it calls addAndroidMarker or addIotMarkers.
+
 ->**addAndroidMarker: **takes as arguments the location (lat and lon) and to id of the android device. it creates a marker for the android device and its infowindow if it doesn't already exist. If it exists it updates the location of the marker and the contents of the infowindow.
 ->**addIotMarkers**: takes as arguments the location (lat and lon) of the iot device the id, the battery value and the values of its sensors(gas,smoke,temp,uv). If there is no iot marker with the same id it creates the marker, its infowindow, the circle under the marker (if needed) and creates the rectangular rectangle (if needed). If there is an iot marker with the same id, it refreshes the infowindow, changes the color, or disappears the circle as appropriate, changes the marker icon if needed, and displays or disappears the rectangular rectangle.
+
 ->**calculateRisk**: takes the sensor values as arguments and returns the risk value (1 for low risk, 2 for medium risk and 3 for high risk) as appropriate.
+
 ->**chooseIcon**: takes as argument the risk value (risk) and chooses the icon for the markers of the iot devices.
+
 ->**getCircleColor**: takes as arguments the values of the sensors and chooses the color of the circle based on whether they are all "null".
+
 ->**drawPolygon**: creates a rectangular polygon based on two points on the map.
 
 To run the GUI, node.js (v18.13.0) and the corresponding npm package manager are needed. In the graphical interface folder we run the command "npm install" to install the required packages. Then to run the GUI in its folder we execute the command "npm run dev". The GUI is configured to run on port:8080 and we can see it in the browser at:
