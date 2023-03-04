@@ -108,6 +108,6 @@ To run the GUI, node.js (v18.13.0) and the corresponding npm package manager are
 http://localhost:8080/
 
 
-For a more complete presentation using screenshots there is also the readme.pdf file
+For a more complete presentation using screenshots there is also the readme.pdf file.
 
 
